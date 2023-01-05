@@ -1,0 +1,15 @@
+/Users/nngoc2701/Projects/UploadClient/bin/Debug/net7.0/UploadClient
+/Users/nngoc2701/Projects/UploadClient/bin/Debug/net7.0/UploadClient.deps.json
+/Users/nngoc2701/Projects/UploadClient/bin/Debug/net7.0/UploadClient.runtimeconfig.json
+/Users/nngoc2701/Projects/UploadClient/bin/Debug/net7.0/UploadClient.dll
+/Users/nngoc2701/Projects/UploadClient/bin/Debug/net7.0/UploadClient.pdb
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.csproj.AssemblyReference.cache
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.GeneratedMSBuildEditorConfig.editorconfig
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.AssemblyInfoInputs.cache
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.AssemblyInfo.cs
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.csproj.CoreCompileInputs.cache
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.dll
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/refint/UploadClient.dll
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.pdb
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/UploadClient.genruntimeconfig.cache
+/Users/nngoc2701/Projects/UploadClient/obj/Debug/net7.0/ref/UploadClient.dll
