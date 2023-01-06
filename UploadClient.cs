@@ -15,6 +15,17 @@ public class DirClient
         this.ipe = new IPEndPoint(IPAddress.Parse(ipaddr), port);
     }
     
+    public static void writeInFile(string describe){
+        try {
+            using StreamWriter file = new("responses.txt", append: true);
+            file.WriteLine(describe);
+//            System.out.println(describe);
+
+        } catch (Exception e) {
+            Console.WriteLine(e);
+        }
+    }
+
     public string getListing(string path)
     {
         string a = "";
