@@ -5,13 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+
 public class DirClient
 {
     private IPEndPoint ipe;
+
     public DirClient(string ipaddr, int port)
     {
         this.ipe = new IPEndPoint(IPAddress.Parse(ipaddr), port);
     }
+    
     public string getListing(string path)
     {
         string a = "";
