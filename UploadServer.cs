@@ -4,30 +4,27 @@ public class DirListing {
         Socket cls = null;
         public DirListing(Socket socket) { this.cls = socket; }
         public void threadMethod() {
-            Byte[] bytesReceived = new Byte[1];
-            string a = "";
-            while (true) {
-                if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
-                 (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0')) {
-                    break;
-                }
-                a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
-            }
-            Console.WriteLine(a);
-            try
-            {
-                DirectoryInfo di = new DirectoryInfo(a);
-                FileInfo[] fiArr = di.GetFiles();
-                string files = "";
-                foreach (FileInfo fri in fiArr) { files = files + fri.Name; }
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
-                cls.Send(msg, msg.Length, 0);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Directory exception: {0}", e);
-            }
-            cls.Close();
+                    Byte[] bytesReceived = new Byte[1];
+                    string a = "";
+                    bool stop = false;
+                    IAsyncResult result;
+                    Action action = () =>
+                    {
+                        while (!stop) {
+                            if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
+                            (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0')) {
+                                break;
+                            }
+                            a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
+                        }
+                    };
+                    result = action.BeginInvoke(null, null);
+                    if (!result.AsyncWaitHandle.WaitOne(1000)) stop = true;
+
+                    Console.WriteLine(a);
+                    string res = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-length: 513\r\n\r\n<!DOCTYPE html>\r\n<html>\n   <head>\n       <title>File Upload Form</title>\n   </head>\n   <body>\n       <h1>Upload file</h1>\n       <form method=\"POST\" action=\"upload\" enctype=\"multipart/form-data\">\n           <input type=\"file\" name=\"fileName\"/><br/><br/>\n           Caption: <input type=\"text\" name=\"caption\"<br/><br/><br/>\n           Date: <input type=\"date\" name=\"date\"<br/><br/><br/>\n           <input type=\"submit\" value=\"Submit\"/>\n       </form>\n   </body>\n</html>\r\n\r\n";
+                    cls.Send(System.Text.Encoding.ASCII.GetBytes(res + '\0'), 0);
+                    cls.Close();
         }
         static void Main(string[] args) {
             try {
@@ -39,7 +36,7 @@ public class DirListing {
                     Socket cls = s.Accept();
                     DirListing dirListing = new DirListing(cls);
                     Thread thread = new Thread(new ThreadStart(dirListing.threadMethod));
-                    thread.Start();
+                        thread.Start();
                 }
                 s.Close();
             }
