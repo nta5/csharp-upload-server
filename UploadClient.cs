@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Drawing;
 
 public class DirClient
 {
@@ -15,17 +16,6 @@ public class DirClient
     {
         this.ipe = new IPEndPoint(IPAddress.Parse(ipaddr), port);
     }
-    
-//    public static void writeInFile(string describe){
-//        try {
-//            using StreamWriter file = new("responses.txt", append: true);
-//            file.WriteLine(describe);
-//            System.out.println(describe);
-//
-//        } catch (Exception e) {
-//            Console.WriteLine(e);
-//        }
-//    }
 
     public bool checkPath(string path)
     {
@@ -37,9 +27,19 @@ public class DirClient
         return false;
     }
 
+    private byte[] GetBytesFromImage(String imageFile)
+{
+    MemoryStream ms = new MemoryStream();
+    Image img= Image.FromFile(imageFile);
+    img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            
+    return ms.ToArray();
+}
+
     public string getListing(string path)
     {
-        string a = "";
+        FileStream fileStream;
+        //string a = "";
         string myPath = "";
         string myCaption = "";
         string myDate = "";
@@ -64,6 +64,30 @@ public class DirClient
 
                 Console.WriteLine("final #path: " + myPath + " #caption: " + myCaption + " #date: " + myDate);
 
+                string currentPath = Directory.GetCurrentDirectory();
+                string folderPath = currentPath + @"\" + "images";
+                string filePath = currentPath + @"\" + "imagesInfor.txt";
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                if (!Directory.Exists(filePath))
+                {
+                    fileStream = new FileStream("imagesInfor.txt", FileMode.Append, FileAccess.Write);
+                    fileStream.Close();
+                }
+                using (StreamWriter outputFile = new StreamWriter((filePath), true))
+                {
+                    outputFile.WriteLine(myPath + @"*" + myCaption + @"*" + myDate + @"*");
+                }
+
+                //byte[] img = GetBytesFromImage(myPath);
+                //Bitmap bitmap = new Bitmap(myPath);
+                //Console.WriteLine(bitmap);
+                //System.IO.File.WriteAllBytes(folderPath, img);
+
+
                 //Byte[] bytesSent = Encoding.ASCII.GetBytes(myPath + '\0');
                 //Console.WriteLine("bytesSent: " + bytesSent);
                 //mySocket.Send(bytesSent, bytesSent.Length, 0);
@@ -78,9 +102,8 @@ public class DirClient
                 //    a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
                 //}
             }
-            
             mySocket.Close();
-            return "Successfully updated image" + myCaption;
+            return "Successfully updated image " + myCaption;
         }
         catch (ArgumentNullException e)
         {
