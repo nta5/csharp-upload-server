@@ -23,13 +23,13 @@ public class DirListing {
                     {
                         while (!stop) {
                             // Commented out to test if the second clause after || prevents the Post req from printing 
-                            // if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
-                            // (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0')) {
-                            //     break;
-                            // }
-                            if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0)) {
-                                break;
-                            }
+                            if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
+                             (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0')) {
+                                 break;
+                             }
+                            //if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0)) {
+                            //    break;
+                            //}
                             req += Encoding.ASCII.GetString(bytesReceived, 0, 1);
                         }
                     };
