@@ -36,7 +36,7 @@ public class DirListing {
                     result = action.BeginInvoke(null, null);
                     if (!result.AsyncWaitHandle.WaitOne(1000)) stop = true;
 
-                    Console.WriteLine(req);
+                    Console.WriteLine("connected to server");
                     string res;
                     if(req.StartsWith("G")){
                         res = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-length: 513\r\n\r\n<!DOCTYPE html>\r\n<html>\n   <head>\n       <title>File Upload Form</title>\n   </head>\n   <body>\n       <h1>Upload file</h1>\n       <form method=\"POST\" action=\"upload\" enctype=\"multipart/form-data\">\n           <input type=\"file\" name=\"fileName\"/><br/><br/>\n           Caption: <input type=\"text\" name=\"caption\"<br/><br/><br/>\n           Date: <input type=\"date\" name=\"date\"<br/><br/><br/>\n           <input type=\"submit\" value=\"Submit\"/>\n       </form>\n   </body>\n</html>\r\n\r\n";
