@@ -10,11 +10,11 @@ using System.Net.Sockets;
 
 public class ServletRequest
 {
-    private string reqeust;
+    private string request;
     private string[] lines;
 
     public ServletRequest(string req){
-        this.reqeust = req;
+        this.request = req;
         lines = req.Split('\n');
 
         // for(int i = 0; i < lines.Length; i++){
@@ -29,7 +29,7 @@ public class ServletRequest
         {
             if (lines[i].Contains("filename"))
             {
-                string[] names = lines[i].Split(new string[] { "filename=\"" }, StringSplitOptions.RemoveEmptyEntries);
+                string[] names = lines[i].Split(new string[] { "filename=\"" }, StringSplitOptions.None);
                 fileName = names[1].Substring(0, names[1].Length - 2);
                 break;
             }
@@ -47,6 +47,11 @@ public class ServletRequest
             }
         }
 
+        if (string.IsNullOrEmpty(date.Trim())) {
+            DateTime now = DateTime.Now;
+            cap = "No caption";
+        }
+
         return cap;
     }
 
@@ -61,6 +66,11 @@ public class ServletRequest
                 date = lines[i + 2];
                 break;
             }
+        }
+
+        if (string.IsNullOrEmpty(date.Trim())) {
+            DateTime now = DateTime.Now;
+            date = now.Year + "-" + now.Month + "-" + now.Day;
         }
 
         return date;

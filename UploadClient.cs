@@ -8,11 +8,11 @@ using System.Net.Sockets;
 using System.IO;
 using System.Drawing;
 
-public class DirClient
+public class UploadClient
 {
     private IPEndPoint ipe;
 
-    public DirClient(string ipaddr, int port)
+    public UploadClient(string ipaddr, int port)
     {
         this.ipe = new IPEndPoint(IPAddress.Parse(ipaddr), port);
     }
@@ -36,20 +36,20 @@ public class DirClient
         return ms.ToArray();
     }
 
-    public string getListing(string path)
+    public string uploadFile()
     {
-        FileStream fileStream;
-        //string a = "";
-        string myPath = "";
-        string myCaption = "";
-        string myDate = "";
         try
         {
             Socket mySocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
             mySocket.Connect(ipe);
             if (mySocket.Connected)
             {
-                myPath = path;
+                FileStream fileStream;
+                string myCaption = "";
+                string myDate = "";
+
+                Console.WriteLine("Enter path:");
+                string myPath = Console.ReadLine();
                 while (!checkPath(myPath))
                 {
                     Console.WriteLine("Path invalid!");
@@ -57,6 +57,7 @@ public class DirClient
                     string modifyPath = Console.ReadLine();
                     myPath = modifyPath;
                 }
+
                 Console.WriteLine("Enter caption:");
                 myCaption = Console.ReadLine();
                 Console.WriteLine("Enter date:");
@@ -77,7 +78,7 @@ public class DirClient
                     fileStream = new FileStream("imagesInfor.txt", FileMode.Append, FileAccess.Write);
                     fileStream.Close();
                 }
-                using (StreamWriter outputFile = new StreamWriter((filePath), true))
+                using (StreamWriter outputFile = new StreamWriter("imagesInfor.txt", true))
                 {
                     outputFile.WriteLine(myPath + @"*" + myCaption + @"*" + myDate + @"*");
                 }
@@ -116,12 +117,11 @@ public class DirClient
     }
     static void Main(string[] args)
     {
-        DirClient myDirClient = new DirClient("127.0.0.1", 8888);
+        UploadClient myClient = new UploadClient("127.0.0.1", 8888);
 
-        Console.WriteLine("Enter path:");
-        string pathNew = Console.ReadLine();
+        
 
-        Console.WriteLine(myDirClient.getListing(pathNew));
+        Console.WriteLine(myClient.uploadFile(pathNew));
         //the following call is just to block the main thread so that the results are listed to the screen
         //Console.Read();
         Console.WriteLine("Press any key to close the console...");
