@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.IO;
 using System.Drawing;
+using System.Web;
 
 public class UploadClient
 {
@@ -27,16 +28,7 @@ public class UploadClient
         return false;
     }
 
-    private byte[] GetBytesFromImage(String imageFile)
-    {
-        MemoryStream ms = new MemoryStream();
-        Image img = Image.FromFile(imageFile);
-        img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-
-        return ms.ToArray();
-    }
-
-    public string uploadFile()
+    public void uploadFile()
     {
         try
         {
@@ -44,7 +36,6 @@ public class UploadClient
             mySocket.Connect(ipe);
             if (mySocket.Connected)
             {
-                FileStream fileStream;
                 string myCaption = "";
                 string myDate = "";
 
@@ -66,45 +57,40 @@ public class UploadClient
                 Console.WriteLine("final #path: " + myPath + " #caption: " + myCaption + " #date: " + myDate);
 
                 string currentPath = Directory.GetCurrentDirectory();
-                string folderPath = currentPath + @"\" + "images";
-                string filePath = currentPath + @"\" + "imagesInfor.txt";
+                // Mac user
+                string folderPath = currentPath + @"/" + "images";
+                // Windows user
+                // string folderPath = currentPath + @"\" + "images";
 
                 if (!Directory.Exists(folderPath))
                 {
                     Directory.CreateDirectory(folderPath);
                 }
-                if (!Directory.Exists(filePath))
+
+                byte[] img = File.ReadAllBytes(myPath);
+                // string imgName = myPath.Split('/')[myPath.Split('/').Length - 1];
+                // string saveName = "/" + imgName.Split('.')[0] + "_" + myDate.Replace(' ', '-') + "_" + myCaption.Replace(' ', '-') + ".png";
+                // using (var fs = new FileStream(folderPath + saveName, FileMode.Create, FileAccess.Write))
+                // {
+                //     fs.Write(img, 0, img.Length);
+                // }
+                Console.WriteLine("Successfully updated image " + myCaption);
+                mySocket.Send(img);
+                mySocket.Shutdown(SocketShutdown.Send);
+
+                Byte[] bytesReceived = new Byte[1];
+                string res = "";
+                while (true)
                 {
-                    fileStream = new FileStream("imagesInfor.txt", FileMode.Append, FileAccess.Write);
-                    fileStream.Close();
+                   if ((mySocket.Receive(bytesReceived, bytesReceived.Length, 0) == 0) || (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0'))
+                   {
+                       break;
+                   }
+                   res += Encoding.ASCII.GetString(bytesReceived, 0, 1);
                 }
-                using (StreamWriter outputFile = new StreamWriter("imagesInfor.txt", true))
-                {
-                    outputFile.WriteLine(myPath + @"*" + myCaption + @"*" + myDate + @"*");
-                }
-
-                //byte[] img = GetBytesFromImage(myPath);
-                //Bitmap bitmap = new Bitmap(myPath);
-                //Console.WriteLine(bitmap);
-                //System.IO.File.WriteAllBytes(folderPath, img);
-
-
-                //Byte[] bytesSent = Encoding.ASCII.GetBytes(myPath + '\0');
-                //Console.WriteLine("bytesSent: " + bytesSent);
-                //mySocket.Send(bytesSent, bytesSent.Length, 0);
-                //Byte[] bytesReceived = new Byte[1];
-                //while (true)
-                //{
-                //    if ((mySocket.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
-                //              (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0'))
-                //    {
-                //        break;
-                //    }
-                //    a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
-                //}
+                Console.WriteLine(res);
             }
             mySocket.Close();
-            return "Successfully updated image " + myCaption;
         }
         catch (ArgumentNullException e)
         {
@@ -118,12 +104,7 @@ public class UploadClient
     static void Main(string[] args)
     {
         UploadClient myClient = new UploadClient("127.0.0.1", 8888);
-
-        
-
-        Console.WriteLine(myClient.uploadFile(pathNew));
-        //the following call is just to block the main thread so that the results are listed to the screen
-        //Console.Read();
+        myClient.uploadFile();
         Console.WriteLine("Press any key to close the console...");
         Console.ReadKey();
     }

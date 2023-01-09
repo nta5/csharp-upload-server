@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ public class UploadServlet
     {
         Byte[] bytesReceived = new Byte[1];
         string req = "";
+        ArrayList reqByte = new ArrayList();
         IAsyncResult result;
 
         Action action = () =>
@@ -27,8 +29,11 @@ public class UploadServlet
             // Console.WriteLine("Async thread");
             while (true)
             {
-                cls.Receive(bytesReceived, bytesReceived.Length, 0);
+                if ((cls.Receive(bytesReceived, bytesReceived.Length, 0) == 0)) {
+                    break;
+                }
                 req += Encoding.ASCII.GetString(bytesReceived, 0, 1);
+                reqByte.Add(bytesReceived[0]);
 
                 if(req.StartsWith("G") && req.Contains("Accept-Language"))
                 {
@@ -66,6 +71,20 @@ public class UploadServlet
             res += "<p> File Name:" + servletRequest.getFileName() + ", Caption: " + servletRequest.getCaption() + ", Date: " + servletRequest.getDate() + "</p>\n";
             res += "</body>\n</html>\r\n\r\n";
             Byte[] msg = System.Text.Encoding.ASCII.GetBytes(res + '\0');
+            cls.Send(msg, msg.Length, 0);
+        } else {
+            string folderPath = Directory.GetCurrentDirectory() + "/images/";
+            using (var fs = new FileStream(folderPath + "image.png", FileMode.Create, FileAccess.Write))
+            {
+                Byte[] bytes = (Byte[]) reqByte.ToArray(typeof(Byte));
+                fs.Write(bytes, 0, bytes.Length);
+            }
+
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            FileInfo[] fiArr = di.GetFiles();
+            string files = "";
+            foreach (FileInfo fri in fiArr) { files = files + fri.Name; }
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
             cls.Send(msg, msg.Length, 0);
         }
         cls.Close();
