@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net;
 using System.Net.Sockets;
+using System.IO;
+using System.Drawing;
 
 public class DirClient
 {
@@ -14,43 +16,94 @@ public class DirClient
     {
         this.ipe = new IPEndPoint(IPAddress.Parse(ipaddr), port);
     }
-    
-    public static void writeInFile(string describe){
-        try {
-            using StreamWriter file = new("responses.txt", append: true);
-            file.WriteLine(describe);
-//            System.out.println(describe);
 
-        } catch (Exception e) {
-            Console.WriteLine(e);
+    public bool checkPath(string path)
+    {
+        FileInfo file = new FileInfo(path);
+        if (file.Exists.Equals(true))
+        {
+            return true;
         }
+        return false;
+    }
+
+    private byte[] GetBytesFromImage(String imageFile)
+    {
+        MemoryStream ms = new MemoryStream();
+        Image img = Image.FromFile(imageFile);
+        img.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+        return ms.ToArray();
     }
 
     public string getListing(string path)
     {
-        string a = "";
+        FileStream fileStream;
+        //string a = "";
+        string myPath = "";
+        string myCaption = "";
+        string myDate = "";
         try
         {
-            Socket s = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            Console.WriteLine(path);
-            s.Connect(ipe);
-            if (s.Connected)
+            Socket mySocket = new Socket(ipe.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            mySocket.Connect(ipe);
+            if (mySocket.Connected)
             {
-                Byte[] bytesSent = Encoding.ASCII.GetBytes(path + '\0');
-                s.Send(bytesSent, bytesSent.Length, 0);
-                Byte[] bytesReceived = new Byte[1];
-                while (true)
+                myPath = path;
+                while (!checkPath(myPath))
                 {
-                    if ((s.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
-                              (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0'))
-                    {
-                        break;
-                    }
-                    a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
+                    Console.WriteLine("Path invalid!");
+                    Console.WriteLine("Enter correct path:");
+                    string modifyPath = Console.ReadLine();
+                    myPath = modifyPath;
                 }
+                Console.WriteLine("Enter caption:");
+                myCaption = Console.ReadLine();
+                Console.WriteLine("Enter date:");
+                myDate = Console.ReadLine();
+
+                Console.WriteLine("final #path: " + myPath + " #caption: " + myCaption + " #date: " + myDate);
+
+                string currentPath = Directory.GetCurrentDirectory();
+                string folderPath = currentPath + @"\" + "images";
+                string filePath = currentPath + @"\" + "imagesInfor.txt";
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+                if (!Directory.Exists(filePath))
+                {
+                    fileStream = new FileStream("imagesInfor.txt", FileMode.Append, FileAccess.Write);
+                    fileStream.Close();
+                }
+                using (StreamWriter outputFile = new StreamWriter((filePath), true))
+                {
+                    outputFile.WriteLine(myPath + @"*" + myCaption + @"*" + myDate + @"*");
+                }
+
+                //byte[] img = GetBytesFromImage(myPath);
+                //Bitmap bitmap = new Bitmap(myPath);
+                //Console.WriteLine(bitmap);
+                //System.IO.File.WriteAllBytes(folderPath, img);
+
+
+                //Byte[] bytesSent = Encoding.ASCII.GetBytes(myPath + '\0');
+                //Console.WriteLine("bytesSent: " + bytesSent);
+                //mySocket.Send(bytesSent, bytesSent.Length, 0);
+                //Byte[] bytesReceived = new Byte[1];
+                //while (true)
+                //{
+                //    if ((mySocket.Receive(bytesReceived, bytesReceived.Length, 0) == 0) ||
+                //              (Encoding.ASCII.GetString(bytesReceived, 0, 1)[0] == '\0'))
+                //    {
+                //        break;
+                //    }
+                //    a += Encoding.ASCII.GetString(bytesReceived, 0, 1);
+                //}
             }
-            s.Close();
-            return a;
+            mySocket.Close();
+            return "Successfully updated image " + myCaption;
         }
         catch (ArgumentNullException e)
         {
@@ -64,8 +117,14 @@ public class DirClient
     static void Main(string[] args)
     {
         DirClient myDirClient = new DirClient("127.0.0.1", 8888);
-        Console.WriteLine(myDirClient.getListing("/"));
+
+        Console.WriteLine("Enter path:");
+        string pathNew = Console.ReadLine();
+
+        Console.WriteLine(myDirClient.getListing(pathNew));
         //the following call is just to block the main thread so that the results are listed to the screen
-        Console.Read();
+        //Console.Read();
+        Console.WriteLine("Press any key to close the console...");
+        Console.ReadKey();
     }
 }
