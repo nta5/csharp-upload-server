@@ -75,7 +75,7 @@ public class DirListing
 
     public int countBoundary(string boundary, string req)
     {
-        string[] lines = req.Split("\n");
+        string[] lines = req.Split('\n');
         int count = 0;
 
         for(int i = 0; i < lines.Length; i++){
