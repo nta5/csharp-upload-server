@@ -47,8 +47,7 @@ public class ServletRequest
             }
         }
 
-        if (string.IsNullOrEmpty(date.Trim())) {
-            DateTime now = DateTime.Now;
+        if (string.IsNullOrEmpty(cap.Trim())) {
             cap = "No caption";
         }
 
