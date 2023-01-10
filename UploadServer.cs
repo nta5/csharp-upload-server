@@ -83,7 +83,10 @@ public class UploadServlet
             DirectoryInfo di = new DirectoryInfo(folderPath);
             FileInfo[] fiArr = di.GetFiles();
             string files = "";
-            foreach (FileInfo fri in fiArr) { files = files + fri.Name; }
+            foreach (FileInfo fri in fiArr) { 
+                files = files + fri.Name; 
+                var filesJson = JsonConvert.SerializeObject(files, Formatting.Indented);
+                }
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
             cls.Send(msg, msg.Length, 0);
         }
