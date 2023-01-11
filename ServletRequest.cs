@@ -41,7 +41,7 @@ public class ServletRequest
             }
         }
 
-        return fileName;
+        return fileName.Split('.')[0];
     }
     public string getCaption(){
         String cap = "";
