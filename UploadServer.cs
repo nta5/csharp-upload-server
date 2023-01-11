@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
-using System.Json;
 using static ServletRequest;
 
 public class UploadServlet
@@ -75,7 +74,7 @@ public class UploadServlet
             cls.Send(msg, msg.Length, 0);
         } else {
             string folderPath = Directory.GetCurrentDirectory() + "/images/";
-            using (var fs = new FileStream(folderPath + "image.png", FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(folderPath + "image_caption_date.png", FileMode.Create, FileAccess.Write))
             {
                 Byte[] bytes = (Byte[]) reqByte.ToArray(typeof(Byte));
                 fs.Write(bytes, 0, bytes.Length);
@@ -84,10 +83,14 @@ public class UploadServlet
             DirectoryInfo di = new DirectoryInfo(folderPath);
             FileInfo[] fiArr = di.GetFiles();
             string files = "";
+            StringBuilder json = new StringBuilder();
+            json.Append("{\n");
             foreach (FileInfo fri in fiArr) { 
-                files = files + fri.Name; 
+                // files = files + fri.Name; 
                 // var filesJson = JsonConvert.SerializeObject(files, Formatting.Indented);
-                // Console.WriteLine(files);
+                String[] content = fri.Name.Split('_');
+                json.Append("  \"fileName\": \"" + content[0] + "\",\n").Append("\"},\n");
+                Console.WriteLine(json);
                 }
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
             cls.Send(msg, msg.Length, 0);
