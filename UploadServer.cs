@@ -53,9 +53,9 @@ public class UploadServlet
         result = action.BeginInvoke(null, null);
         result.AsyncWaitHandle.WaitOne();
 
-        ServletRequest servletRequest = new ServletRequest(req);
-        Console.WriteLine(req);
-        Console.WriteLine("Length: " + req.Length);
+        ServletRequest servletRequest = new ServletRequest(req, reqByte);
+        // Console.WriteLine(req);
+        // Console.WriteLine("Length: " + req.Length);
         string res;
 
         if (req.StartsWith("G"))
@@ -66,13 +66,30 @@ public class UploadServlet
         }
         else if (req.StartsWith("P"))
         {
+            string folderPath = Directory.GetCurrentDirectory() + "/images/";
+            using (var fs = new FileStream(folderPath + servletRequest.getFileName() + "_" + servletRequest.getCaption() +"_" + servletRequest.getDate() + ".png", FileMode.Create, FileAccess.Write))
+            {
+                ArrayList imgByte = servletRequest.getBytes();
+                Byte[] bytes = (Byte[])imgByte.ToArray(typeof(Byte));
+                fs.Write(bytes, 0, bytes.Length);
+            }
+
             res = "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<!DOCTYPE html>\r\n<html>\n   <head>\n       <title>File Upload</title>\n   </head>\n   <body>\n       ";
             res += "<h1>Files uploaded:</h1>\n";
-            res += "<p> File Name:" + servletRequest.getFileName() + ", Caption: " + servletRequest.getCaption() + ", Date: " + servletRequest.getDate() + "</p>\n";
+
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            FileInfo[] fiArr = di.GetFiles();
+            foreach (FileInfo fri in fiArr)
+            {
+                res += "<p>- " + fri.Name + "</p>\n";
+            }
             res += "</body>\n</html>\r\n\r\n";
-            Byte[] msg = System.Text.Encoding.ASCII.GetBytes(res + '\0');
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(res + '\0');
             cls.Send(msg, msg.Length, 0);
-        } else {
+        } 
+        ///TO-DO: need to distinguish the connection from Console only 
+        else if(req.StartsWith("C"))
+        {
             string folderPath = Directory.GetCurrentDirectory() + "/images/";
             using (var fs = new FileStream(folderPath + "image_caption_date.png", FileMode.Create, FileAccess.Write))
             {
