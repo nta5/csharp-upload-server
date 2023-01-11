@@ -91,8 +91,9 @@ public class UploadServlet
         else if(req.StartsWith("C"))
         {
             string folderPath = Directory.GetCurrentDirectory() + "/images/";
-            using (var fs = new FileStream(folderPath + "image_caption_date.png", FileMode.Create, FileAccess.Write))
+            using (var fs = new FileStream(folderPath + servletRequest.getFileName() + "_" + servletRequest.getCaption() +"_" + servletRequest.getDate() + ".png", FileMode.Create, FileAccess.Write))
             {
+                ArrayList imgByte = servletRequest.getBytes();
                 Byte[] bytes = (Byte[]) reqByte.ToArray(typeof(Byte));
                 fs.Write(bytes, 0, bytes.Length);
             }

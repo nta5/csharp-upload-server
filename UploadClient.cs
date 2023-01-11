@@ -75,7 +75,9 @@ public class UploadClient
                 //     fs.Write(img, 0, img.Length);
                 // }
                 Console.WriteLine("Successfully updated image " + myCaption);
+                mySocket.Send(Encoding.ASCII.GetBytes("Console \r\n Content-Disposition: form-data; name=\"fileName\"; filename=\"" + Path.GetFileName(myPath) + "\"\r\n Content-Type: image/png\r\n \r\n"));
                 mySocket.Send(img);
+                mySocket.Send(Encoding.ASCII.GetBytes("\r\n Content-Disposition: form-data; name=\"caption\"\r\n \r\n" + myCaption + "\r\n Content-Disposition: form-data; name=\"date\"\r\n \r\n" + myDate + "\r\n"));
                 mySocket.Shutdown(SocketShutdown.Send);
 
                 Byte[] bytesReceived = new Byte[1];
