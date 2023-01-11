@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Net;
 using System.Net.Sockets;
+using System.Json;
 using static ServletRequest;
 
 public class UploadServlet
@@ -85,7 +86,8 @@ public class UploadServlet
             string files = "";
             foreach (FileInfo fri in fiArr) { 
                 files = files + fri.Name; 
-                var filesJson = JsonConvert.SerializeObject(files, Formatting.Indented);
+                // var filesJson = JsonConvert.SerializeObject(files, Formatting.Indented);
+                // Console.WriteLine(files);
                 }
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
             cls.Send(msg, msg.Length, 0);
