@@ -87,7 +87,6 @@ public class UploadServlet
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(res + '\0');
             cls.Send(msg, msg.Length, 0);
         } 
-        ///TO-DO: need to distinguish the connection from Console only 
         else if(req.StartsWith("C"))
         {
             string folderPath = Directory.GetCurrentDirectory() + "/images/";
@@ -100,17 +99,20 @@ public class UploadServlet
 
             DirectoryInfo di = new DirectoryInfo(folderPath);
             FileInfo[] fiArr = di.GetFiles();
-            string files = "";
             StringBuilder json = new StringBuilder();
             json.Append("{\n");
             foreach (FileInfo fri in fiArr) { 
-                // files = files + fri.Name; 
-                // var filesJson = JsonConvert.SerializeObject(files, Formatting.Indented);
                 String[] content = fri.Name.Split('_');
-                json.Append("  \"fileName\": \"" + content[0] + "\",\n").Append("\"},\n");
-                Console.WriteLine(json);
-                }
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes(files + '\0');
+                if (content.Length < 3) continue;
+                json.Append("  {\n");
+                json.Append("  \"fileName\": \"" + fri.Name.Trim() + "\",\n");
+                json.Append("  \"caption\": \"" + content[1].Trim() + "\",\n");
+                json.Append("  \"date\": \"" + content[2].Split('.')[0].Trim() + "\"\n");
+                json.Append("  },\n");
+            }
+            json.Append("}\n");
+            json.Append("\0");
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes(json.ToString());
             cls.Send(msg, msg.Length, 0);
         }
         cls.Close();

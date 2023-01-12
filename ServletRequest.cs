@@ -58,7 +58,7 @@ public class ServletRequest
             cap = "No caption";
         }
 
-        return cap;
+        return cap.Trim().Replace(" ", "-");
     }
 
     public string getDate()
@@ -79,7 +79,7 @@ public class ServletRequest
             date = now.Year + "-" + now.Month + "-" + now.Day;
         }
 
-        return date;
+        return date.Trim();
     }
 
     public ArrayList getBytes(){
