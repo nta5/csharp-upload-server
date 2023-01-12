@@ -93,7 +93,7 @@ public class UploadServlet
             using (var fs = new FileStream(folderPath + servletRequest.getFileName() + "_" + servletRequest.getCaption() +"_" + servletRequest.getDate() + ".png", FileMode.Create, FileAccess.Write))
             {
                 ArrayList imgByte = servletRequest.getBytes();
-                Byte[] bytes = (Byte[]) reqByte.ToArray(typeof(Byte));
+                Byte[] bytes = (Byte[]) imgByte.ToArray(typeof(Byte));
                 fs.Write(bytes, 0, bytes.Length);
             }
 
